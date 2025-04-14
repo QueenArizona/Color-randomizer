@@ -10,9 +10,11 @@ function generateRandomColor() {
     return '#' + color;
 }
 
-function setRandomColors() {
+function setRandomColors(isInitial = false) {
     const columns = document.querySelectorAll('.column');
     if (!columns.length) return;
+
+    const colors = isInitial ? getColorsFromHash() : [];
 
     columns.forEach((column, index) => {
         const text = column.querySelector('h2');
@@ -20,15 +22,22 @@ function setRandomColors() {
         if (!text || !button) return;
 
         const isLocked = checkLocked(column);
-        if (isLocked) return;
+        if (isLocked) {
+            if (!colors[index]) colors.push(text.textContent);
+            return;
+        }
 
-        const color = generateRandomColor();
+        const color = isInitial && colors[index] ? colors[index] : generateRandomColor();
+
+        if (!colors[index]) colors.push(color);
         column.style.backgroundColor = color;
 
         text.textContent = color;
         setColor(text, color);
         setColor(button, color);
     })
+
+    updateColorsHash(colors);
 }
 
 function setColor(element, color) {
@@ -73,6 +82,19 @@ function copy(text) {
     return navigator.clipboard.writeText(text);
 }
 
+function updateColorsHash(colors = []) {
+    document.location.hash = colors.map(color => {
+        return color.substring(1);
+    }).join('-');
+}
+
+function getColorsFromHash() {
+    if (document.location.hash.length > 1) {
+        return document.location.hash.substring(1).split('-').map(color => '#' + color);
+    }
+    return [];
+}
+
 document.addEventListener('click', handleTextClick);
 document.addEventListener('click', handleButtonClick);
 
@@ -84,5 +106,5 @@ document.addEventListener('keydown', function(event) {
 })
 
 document.addEventListener('DOMContentLoaded', function() {
-    setRandomColors();
+    setRandomColors(true);
 })
