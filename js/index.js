@@ -68,14 +68,17 @@ function handleTextClick(event) {
 function handleButtonClick(event) {
     const target = event.target;
 
-    const button = target.closest('.palette button');
-    if (!button) return;
+    const lockButton = target.closest('.palette__inner button');
+    if (lockButton) {
+        const icon = lockButton.querySelector('i');
+        if (!icon) return;
 
-    const icon = button.querySelector('i');
-    if (!icon) return;
+        icon.classList.toggle('fa-lock-open');
+        icon.classList.toggle('fa-lock');
+    }
 
-    icon.classList.toggle('fa-lock-open');
-    icon.classList.toggle('fa-lock');
+    const generateButton = target.closest('.palette__menu button');
+    if (generateButton) setRandomColors();
 }
 
 function copy(text) {
@@ -97,7 +100,6 @@ function getColorsFromHash() {
 
 document.addEventListener('click', handleTextClick);
 document.addEventListener('click', handleButtonClick);
-
 
 document.addEventListener('keydown', function(event) {
     event.preventDefault();
